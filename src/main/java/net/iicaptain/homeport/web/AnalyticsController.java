@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -62,13 +63,14 @@ public class AnalyticsController {
 	Job job;
 	
 	@RequestMapping(value = { "/start" }, method = RequestMethod.GET)
-	public String pivotal(@RequestParam(value="app", defaultValue="www.springsource.org") String app, Model model) {
+	public String pivotal(@RequestParam(value="app", defaultValue="www.springsource.org") String app, Model model, HttpSession session) {
 		model.addAttribute("app", app);
+		session.setAttribute("app", app);
 		return "pivotal";
 	}
 	
 	@RequestMapping(value = { "/startjob" }, method = RequestMethod.GET)
-	public String triggerbatch() {
+	public String triggerbatch(Model model, HttpSession session) {
 
 		try {
 			
@@ -80,6 +82,7 @@ public class AnalyticsController {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
+		model.addAttribute("app", session.getAttribute("app"));
 		return "pivotal";
 	}
 	

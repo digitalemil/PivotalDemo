@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:int-gfe="http://www.springframework.org/schema/integration/gemfire"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/integration/gemfire http://www.springframework.org/schema/integration/gemfire/spring-integration-gemfire.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+
+	<import resource="security-config.xml" />
+
+	<import resource="infrastructure-config.xml" />
+
+	<import resource="hadoop.xml" />
+
+	<import resource="batch.xml" />
+
+	<context:component-scan base-package="net.iicaptain.homeport.impl"></context:component-scan>
+
+	<int-gfe:outbound-channel-adapter id="locationsToGem"
+		region="iicaptainLocations" />
+
+	<int-gfe:outbound-channel-adapter id="worldsToGem"
+		region="iicaptainWorlds" />
+
+	<bean id="resourceService"
+		class="org.springframework.batch.admin.web.resources.DefaultResourceService">
+		<property name="servletPath" value="/batch" />
+	</bean>
+
+	<batch:job id="locationCounter">
+		<batch:step id="import" next="countLastHour">
+			<batch:tasklet ref="prepareFiles" />
+		</batch:step>
+
+		<batch:step id="countLastHour" next="countLastDay">
+			<batch:tasklet ref="locationsLastHourJob" />
+		</batch:step>
+
+		<batch:step id="countLastDay" next="countLastWeek">
+			<batch:tasklet ref="locationsLastDayJob" />
+		</batch:step>
+
+		<batch:step id="countLastWeek" next="countAll">
+			<batch:tasklet ref="locationsLastWeekJob" />
+		</batch:step>
+
+		<batch:step id="countAll" next="clean">
+			<batch:tasklet ref="locationsAllJob" />
+		</batch:step>
+
+		<batch:step id="clean">
+			<batch:tasklet ref="cleanUp" />
+		</batch:step>
+	</batch:job>
+
+	<hdp:script-tasklet id="prepareFiles" scope="prototype">
+		<hdp:script language="javascript">
+			if(fsh.test("/user/vfabric/iicaptain-in")) {
+				fsh.rmr("/user/vfabric/iicaptain-in");
+				fsh.mkdir("/user/vfabric/iicaptain-in");
+			}
+			fsh.cp("/user/vfabric/iicaptain", "/user/vfabric/iicaptain-in");
+			if(fsh.test("/user/vfabric/locations-lastHour"))
+				fsh.rmr("/user/vfabric/locations-lastHour");
+			if(fsh.test("/user/vfabric/locations-all"))
+				fsh.rmr("/user/vfabric/locations-all");
+			if(fsh.test("/user/vfabric/locations-lastDay"))
+				fsh.rmr("/user/vfabric/locations-lastDay");
+			if(fsh.test("/user/vfabric/locations-lastWeek"))
+				fsh.rmr("/user/vfabric/locations-lastWeek");
+		</hdp:script>
+	</hdp:script-tasklet>
+
+	<hdp:job-tasklet id="locationsLastHourJob" job-ref="locationsLastHour" />
+	<hdp:job-tasklet id="locationsLastDayJob" job-ref="locationsLastDay" />
+	<hdp:job-tasklet id="locationsLastWeekJob" job-ref="locationsLastWeek" />
+	<hdp:job-tasklet id="locationsAllJob" job-ref="locationsAll" />
+
+	<hdp:script-tasklet id="cleanUp" scope="prototype">
+		<hdp:script language="javascript">
+			fsh.rmr("/user/vfabric/iicaptain-in");
+		</hdp:script>
+	</hdp:script-tasklet>
+
+</beans>

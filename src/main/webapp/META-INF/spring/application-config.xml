@@ -59,7 +59,7 @@
 	</batch:job>
 
 	<hdp:script-tasklet id="prepareFiles" scope="prototype">
-		<hdp:script language="javascript">
+		<hdp:script language="groovy">
 			if(fsh.test("/user/vfabric/iicaptain-in")) {
 				fsh.rmr("/user/vfabric/iicaptain-in");
 				fsh.mkdir("/user/vfabric/iicaptain-in");
@@ -82,7 +82,7 @@
 	<hdp:job-tasklet id="locationsAllJob" job-ref="locationsAll" />
 
 	<hdp:script-tasklet id="cleanUp" scope="prototype">
-		<hdp:script language="javascript">
+		<hdp:script language="groovy">
 			fsh.rmr("/user/vfabric/iicaptain-in");
 		</hdp:script>
 	</hdp:script-tasklet>
