@@ -6,11 +6,11 @@
         http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<hdp:configuration>
-		fs.default.name=hdfs://192.168.100.1:54310/
+		fs.default.name=hdfs://server0:54310/
 		mapred.job.tracker=server0:54311
 	</hdp:configuration>
 
-	<hdp:file-system id="fs" uri="hdfs://192.168.100.1:54310/"
+	<hdp:file-system id="fs" uri="hdfs://server0:54310/"
 		user="vfabric" />
 	
 	<!-- Path to jar file when running in STS -->

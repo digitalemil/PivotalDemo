@@ -6,13 +6,15 @@
         http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<hdp:configuration>
-		fs.default.name=hdfs://192.168.100.1:54310/
+		fs.default.name=hdfs://server0:54310/
 		mapred.job.tracker=server0:54311
 	</hdp:configuration>
 
-	<hdp:file-system id="fs" uri="hdfs://192.168.100.1:54310/"
+	<hdp:file-system id="fs" uri="hdfs://server0:54310/"
 		user="vfabric" />
-
+	
+	<!-- Path to jar file when running in STS -->
+	<!-- 
 	<hdp:job id="locationsLastHour" jar="file:///Users/esiemes/Dropbox/digitalemil/projects/iiCaptainMapReduce/target/iicaptain-mapreduce-0.0.1-SNAPSHOT.jar"
 		input-path="/user/vfabric/iicaptain-in" output-path="/user/vfabric/locations-lastHour"
 		mapper="net.iicaptain.hadoop.LocationCount.Map" reducer="net.iicaptain.hadoop.LocationCount.Reduce" scope="prototype" />
@@ -28,6 +30,21 @@
 	<hdp:job id="locationsAll" jar="file:///Users/esiemes/Dropbox/digitalemil/projects/iiCaptainMapReduce/target/iicaptain-mapreduce-0.0.1-SNAPSHOT.jar"
 		input-path="/user/vfabric/iicaptain-in" output-path="/user/vfabric/locations-all"
 		mapper="net.iicaptain.hadoop.LocationCountAll.Map" reducer="net.iicaptain.hadoop.LocationCount.Reduce" scope="prototype"/>
-	
+	-->
 
+	<hdp:job id="locationsLastHour" jar="file:///home/vcap/iicaptain-mapreduce-0.0.1-SNAPSHOT.jar"
+		input-path="/user/vfabric/iicaptain-in" output-path="/user/vfabric/locations-lastHour"
+		mapper="net.iicaptain.hadoop.LocationCount.Map" reducer="net.iicaptain.hadoop.LocationCount.Reduce" scope="prototype" />
+
+	<hdp:job id="locationsLastDay" jar="file:///home/vcap/iicaptain-mapreduce-0.0.1-SNAPSHOT.jar"
+		input-path="/user/vfabric/iicaptain-in" output-path="/user/vfabric/locations-lastDay"
+		mapper="net.iicaptain.hadoop.LocationCountLastDay.Map" reducer="net.iicaptain.hadoop.LocationCount.Reduce" scope="prototype" />
+	
+	<hdp:job id="locationsLastWeek" jar="file:///home/vcap/iicaptain-mapreduce-0.0.1-SNAPSHOT.jar"
+		input-path="/user/vfabric/iicaptain-in" output-path="/user/vfabric/locations-lastWeek"
+		mapper="net.iicaptain.hadoop.LocationCountLastWeek.Map" reducer="net.iicaptain.hadoop.LocationCount.Reduce" scope="prototype"/>
+	
+	<hdp:job id="locationsAll" jar="file:///home/vcap/iicaptain-mapreduce-0.0.1-SNAPSHOT.jar"
+		input-path="/user/vfabric/iicaptain-in" output-path="/user/vfabric/locations-all"
+		mapper="net.iicaptain.hadoop.LocationCountAll.Map" reducer="net.iicaptain.hadoop.LocationCount.Reduce" scope="prototype"/>
 </beans>
